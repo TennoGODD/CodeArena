@@ -15,6 +15,13 @@ public class MenuChange : MonoBehaviour
     public void SetActive()
     {
         _lvlChanger.SetActive(true);
+        Debug.Log("Its Clicked");
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+        Debug.Log("Its Clicked");
     }
 
 }
