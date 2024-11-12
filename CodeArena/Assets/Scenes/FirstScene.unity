@@ -11999,7 +11999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NPCNameText: {fileID: 77715455}
   NPCDialogueText: {fileID: 1950547171}
-  typeSpeed: 10
+  typeSpeed: 20
 --- !u!114 &1080067908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13658,13 +13658,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1255812159}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.42395115, y: -0.18084648, z: 0.13148566, w: 0.87765115}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 452156315}
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 52.347, y: -19.703, z: 7.284}
 --- !u!114 &1255812161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13699,7 +13699,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.6167675, g: 0.72051334, b: 0.87169814, a: 1}
+  m_Color: {r: 0.9914521, g: 1, b: 0, a: 1}
   m_Intensity: 0.01
   m_Range: 10
   m_SpotAngle: 30
