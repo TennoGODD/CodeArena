@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/FirstScene.unity
     guid: 6cd6fe43c6689e04ca90036f8638c1ab
   - enabled: 1
+    path: Assets/Scenes/FirstFight.unity
+    guid: 400d4f15d18871245a2c37f2742c7175
+  - enabled: 0
     path: Assets/Scenes/FirstTest.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects: {}

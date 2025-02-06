@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -10,6 +11,7 @@ public class Player : MonoBehaviour
     private PlayerInputActions playerInputActions;
 
     private bool allowRotation = true;
+    private bool canMove = true;
 
     private void Awake()
     {
@@ -30,19 +32,29 @@ public class Player : MonoBehaviour
         Vector2 inputVector = GetMovementVector();
         inputVector = inputVector.normalized;
         Vector3 movement = new Vector3(inputVector.x, 0, inputVector.y);
-        rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+        if (canMove)
+        {
+            rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+        }
 
-        if (allowRotation && inputVector.x != 0)
+        if (canMove && allowRotation && inputVector.x != 0)
         {
             spriteRenderer.flipX = inputVector.x > 0;
         }
         UpdateAnimation(inputVector);
     }
+    public void SetCanMove(bool value)
+    {
+        canMove = value;
+    }
 
     private void UpdateAnimation(Vector2 inputVector)
     {
-        bool IsRunning = inputVector.magnitude > 0; 
-        animator.SetBool("IsRunning", IsRunning);
+        bool IsRunning = inputVector.magnitude > 0;
+        if (canMove)
+        {
+            animator.SetBool("IsRunning", IsRunning);
+        }
     }
     public void SetAllowRotation(bool value)
     {

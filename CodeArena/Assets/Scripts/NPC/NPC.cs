@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Entities;
+using Unity.Entities.UniversalDelegates;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,7 +11,7 @@ public abstract class NPC : MonoBehaviour,IInterectable
 {
     [SerializeField] SpriteRenderer _interactSprite;
     [SerializeField] private Transform _playerTransform;
-    private const float INTERACT_DISTANCE = 1f;
+    private const float INTERACT_DISTANCE = 2f;
 
     private void Update() 
     {
@@ -34,4 +37,5 @@ public abstract class NPC : MonoBehaviour,IInterectable
         else
             return false;
     }
+
 }
