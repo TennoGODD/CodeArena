@@ -13,6 +13,7 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private GameObject aiObject; // Ссылка на объект ИИ
     [SerializeField] private GameObject aiEffects;
+    [SerializeField] private GameObject teleportEffect; // Эффект телепортации
     //[SerializeField] private Transform aiStartPoint; // Начальная позиция ИИ
     [SerializeField] private Transform aiEndPoint; // Конечная точка для движения ИИ
     [SerializeField] private float moveSpeed = 3f; // Скорость движения ИИ
@@ -22,6 +23,8 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private GameObject wall;
     [SerializeField] private GameObject wallEffect;
     [SerializeField] private GameObject wallEffectPoint;
+    [SerializeField] private Animator playerAnimator;
+    private bool wasRunningBeforeDialogue = false; 
     private bool conversationEnded;
     private bool isTyping;
     private Coroutine typeDialogueCoroutine;
@@ -76,7 +79,12 @@ public class DialogueController : MonoBehaviour
     {
         if (player != null)
         {
-            player.SetCanMove(false); // Блокируем движение игрока
+            player.SetCanMove(false);
+            if (playerAnimator != null && playerAnimator.GetBool("IsRunning"))
+                {
+                    wasRunningBeforeDialogue = true;
+                    playerAnimator.SetBool("IsRunning", false); 
+                }
         }
 
         if (!gameObject.activeSelf)
@@ -93,9 +101,9 @@ public class DialogueController : MonoBehaviour
 
     private void StartAIMovement()
     {
-        aiHasAppeared = true; // Отметим, что ИИ появился
-        //aiObject.SetActive(true); // Активируем объект ИИ
-        isMovingAI = true; // Начинаем двигать ИИ
+        aiHasAppeared = true; 
+        //aiObject.SetActive(true); 
+        isMovingAI = true; 
     }
 
     private void Update()
@@ -113,37 +121,27 @@ public class DialogueController : MonoBehaviour
         {
             aiObject.transform.position = Vector3.MoveTowards(aiObject.transform.position, aiEndPoint.position, moveSpeed * Time.deltaTime);
 
-            // Проверяем, если ИИ достиг конечной точки, останавливаем движение
             if (Vector3.Distance(aiObject.transform.position, aiEndPoint.position) < 0.1f)
             {
-                isMovingAI = false; // Прекращаем движение
+                isMovingAI = false;
             }
         }
     }
 
     private void EndConversation()
     {
-        if (player != null)
-        {
-            player.SetCanMove(true); // Разблокируем движение
-        }
-
         paragraphs.Clear();
         conversationEnded = false;
-
-        if (gameObject.activeSelf)
-        {
-            gameObject.SetActive(false);
-        }
 
         // Переход на следующую сцену
         if (!string.IsNullOrEmpty(nextSceneName))
         {
-            SceneManager.LoadScene(nextSceneName);
+            StartCoroutine(PlayTeleportEffectAndLoadScene());  
         }
     }
 
-    private IEnumerator TypeDialogueText(string p)  // Убираем <string> из IEnumerator
+
+    private IEnumerator TypeDialogueText(string p) 
     {
         isTyping = true;
         int maxVisibleChars = 0;
@@ -184,5 +182,22 @@ public class DialogueController : MonoBehaviour
 
         mainCamera.transform.position = originalCameraPosition;  // Восстанавливаем исходную позицию камеры
         isShaking = false;
+    }
+    private IEnumerator PlayTeleportEffectAndLoadScene()
+    {
+        if (player != null)
+        {
+            player.SetCanMove(false);
+        }
+
+        Instantiate(teleportEffect, player.transform.position, player.transform.rotation);
+
+
+        yield return new WaitForSeconds(2f); 
+
+        if (!string.IsNullOrEmpty(nextSceneName))
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
     }
 }
