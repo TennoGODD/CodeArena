@@ -8,6 +8,9 @@ public class Player : MonoBehaviour
     [SerializeField] private int attackDamage = 10; // Урон от атаки
     [SerializeField] private Vector3 attackColliderRightPosition; // Положение коллайдера, когда персонаж смотрит вправо
     [SerializeField] private Vector3 attackColliderLeftPosition;  // Положение коллайдера, когда персонаж смотрит влево
+    [SerializeField] private float knockbackForce = 5f; // Сила отскока
+    [SerializeField] private int health = 30; // Здоровье игрока
+    [SerializeField] private float damageCooldown = 0.5f; // Время блокировки движения при получении урона
 
     private float speed = 2f;
     private float jumpForce = 5f;
@@ -19,6 +22,7 @@ public class Player : MonoBehaviour
     private bool allowRotation = true;
     private bool canMove = true;
     private bool isAttacking = false;
+    private bool isTakingDamage = false; // Флаг получения урона
 
     private void Awake()
     {
@@ -54,6 +58,8 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isTakingDamage) return; // Игрок не может двигаться, если получает урон
+
         Vector2 inputVector = GetMovementVector();
         inputVector = inputVector.normalized;
         Vector3 movement = new Vector3(inputVector.x, 0, inputVector.y);
@@ -99,7 +105,7 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded && canMove)
+        if (isGrounded && canMove && !isTakingDamage)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
@@ -109,10 +115,10 @@ public class Player : MonoBehaviour
 
     private void Attack()
     {
-        if (canMove && !isAttacking)
+        if (canMove && !isAttacking && !isTakingDamage)
         {
             isAttacking = true;
-            animator.SetTrigger("Attack");
+            //animator.SetTrigger("Attack");
 
             // Включаем коллайдер атаки
             if (attackCollider != null)
@@ -133,16 +139,19 @@ public class Player : MonoBehaviour
         // Наносим урон всем врагам в зоне атаки
         if (attackCollider != null)
         {
-            Collider[] hitColliders = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents, attackCollider.transform.rotation);
+            // Получаем все коллайдеры в зоне атаки
+            Collider[] hitEnemies = Physics.OverlapBox(attackCollider.bounds.center, attackCollider.bounds.extents, attackCollider.transform.rotation);
 
-            foreach (Collider collider in hitColliders)
+            foreach (Collider enemy in hitEnemies)
             {
-                if (collider.CompareTag("Enemy"))
+                // Проверяем, имеет ли объект тег "Enemy"
+                if (enemy.CompareTag("Enemy"))
                 {
-                    if (collider.TryGetComponent(out Enemy enemyComponent))
+                    // Если у объекта есть компонент EnemyChase, наносим урон и вызываем отскок
+                    if (enemy.TryGetComponent(out Slime enemyComponent))
                     {
-                        enemyComponent.TakeDamage(attackDamage);
-                        Debug.Log("Enemy took damage: " + attackDamage);
+                        enemyComponent.TakeDamage(attackDamage, transform.position);
+                        Debug.Log("Player attacked enemy!");
                     }
                 }
             }
@@ -184,5 +193,62 @@ public class Player : MonoBehaviour
     public void SetAllowRotation(bool value)
     {
         allowRotation = value;
+    }
+
+    public void TakeDamage(int damage, Vector3 enemyPosition)
+    {
+        if (isTakingDamage) return; // Игнорируем урон, если уже получаем его
+
+        health -= damage; // Уменьшаем здоровье
+        Debug.Log("Player took damage: " + damage + ". Health: " + health);
+
+        // Запускаем анимацию получения урона
+        StartCoroutine(DamageEffect());
+
+        // Отскок при получении урона
+        Knockback(enemyPosition);
+
+        // Проверяем, умер ли игрок
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private IEnumerator DamageEffect()
+    {
+        isTakingDamage = true; // Блокируем движение и атаку
+
+        // Мерцание спрайта
+        float elapsedTime = 0f;
+        while (elapsedTime < damageCooldown)
+        {
+            // Изменяем прозрачность спрайта
+            spriteRenderer.color = new Color(1, 1, 1, Mathf.PingPong(elapsedTime * 10, 1));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Возвращаем нормальный цвет спрайта
+        spriteRenderer.color = Color.white;
+
+        isTakingDamage = false; // Разблокируем движение и атаку
+    }
+
+    private void Knockback(Vector3 enemyPosition)
+    {
+        if (rb == null) return;
+
+        // Направление отскока (от противника к игроку)
+        Vector3 knockbackDirection = (transform.position - enemyPosition).normalized;
+
+        // Придаем импульс игроку
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+    }
+
+    private void Die()
+    {
+        Debug.Log("Player died!");
+        // Здесь можно добавить логику смерти игрока (например, перезагрузка уровня)
     }
 }
