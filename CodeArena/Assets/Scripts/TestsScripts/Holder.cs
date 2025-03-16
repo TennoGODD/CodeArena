@@ -1,15 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class Holder : MonoBehaviour , IDropHandler
+public class Holder : MonoBehaviour
 {
-    public void OnDrop(PointerEventData eventData)
+    public void AcceptBlock(DragandDrop block)
     {
-        if (eventData.pointerDrag != null)
+        Debug.Log("AcceptBlock called on " + gameObject.name);
+        if (transform.childCount > 0)
         {
-            eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+            Debug.Log("Swapping blocks");
+            Transform existingBlock = transform.GetChild(0);
+            existingBlock.SetParent(block.ParentToReturnTo);
+            existingBlock.GetComponent<RectTransform>().anchoredPosition = block.StartPosition;
         }
+        block.transform.SetParent(transform);
+        block.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
 }
