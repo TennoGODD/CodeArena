@@ -13,6 +13,6 @@ public class Holder : MonoBehaviour
             existingBlock.GetComponent<RectTransform>().anchoredPosition = block.StartPosition;
         }
         block.transform.SetParent(transform);
-        block.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        block.GetComponent<RectTransform>().localPosition = Vector3.zero;
     }
 }
