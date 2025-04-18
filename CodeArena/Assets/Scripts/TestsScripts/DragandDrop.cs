@@ -7,6 +7,9 @@ public class DragandDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, ID
     private RectTransform rectTransform;
     private Image image;
 
+    [SerializeField] private int itemIndex; // Добавляем индекс элемента
+    public int ItemIndex => itemIndex;
+
     // Свойства для доступа к parentToReturnTo и startPosition
     public Transform ParentToReturnTo { get; private set; }
     public Vector2 StartPosition { get; private set; }

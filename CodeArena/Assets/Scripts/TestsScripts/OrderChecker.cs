@@ -1,52 +1,59 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class OrderChecker : MonoBehaviour
 {
-    public List<Holder> holders; // Список всех Holders (задаём в инспекторе)
-    public List<string> correctOrder; // Список правильного порядка (имена блоков)
+    [SerializeField] private List<Holder> holders; // Все холдеры на сцене
+    
+
 
     public void CheckOrder()
     {
-        List<string> currentOrder = new List<string>();
-
-        // Собираем текущий порядок блоков
+        bool allCorrect = true;
+        
+        // Сначала сбрасываем все цвета
+        ResetAllColors();
+        
+        // Проверяем каждый холдер
         foreach (var holder in holders)
         {
-            if (holder.transform.childCount > 0)
+            if (holder == null) continue;
+            
+            if (holder.CheckCorrectItem())
             {
-                currentOrder.Add(holder.transform.GetChild(0).name);
+                HighlightHolder(holder, Color.green);
             }
             else
             {
-                currentOrder.Add("Empty"); // Если холдер пустой
+                HighlightHolder(holder, Color.red);
+                allCorrect = false;
             }
         }
-
-        // Сравниваем с правильным порядком
-        bool isCorrect = true;
-        for (int i = 0; i < correctOrder.Count; i++)
+        
+        if (allCorrect)
         {
-            if (currentOrder[i] != correctOrder[i])
-            {
-                isCorrect = false;
-                break;
-            }
+            Debug.Log("Все элементы на своих местах!");
         }
+    }
 
-        // Вывод результата
-        if (isCorrect)
+    private void HighlightHolder(Holder holder, Color color)
+    {
+        if (holder.transform.childCount > 0)
         {
-            Debug.Log("Порядок верный!");
+            var image = holder.transform.GetChild(0).GetComponent<Image>();
+            if (image != null) image.color = color;
         }
-        else if (!isCorrect)
+    }
+
+    private void ResetAllColors()
+    {
+        foreach (var holder in holders)
         {
-            for (int i = 0; i < holders.Count; i++)
+            if (holder != null && holder.transform.childCount > 0)
             {
-                if (currentOrder[i] != correctOrder[i] && holders[i].transform.childCount > 0)
-                {
-                    holders[i].transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().color = Color.red;
-                }
+                var image = holder.transform.GetChild(0).GetComponent<Image>();
+                if (image != null) image.color = Color.white;
             }
         }
     }
