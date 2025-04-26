@@ -20,8 +20,15 @@ public class DragandDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, ID
         image = GetComponent<Image>();
     }
 
+    private bool isDraggable = true;
+    public void SetDraggable(bool value)
+    {
+        isDraggable = value;
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!isDraggable) return;
         image.color = new Color(0f, 255f, 200f, 0.7f);
         image.raycastTarget = false; // Отключаем Raycast для TextBox
         ParentToReturnTo = transform.parent; // Сохраняем текущего родителя
@@ -31,11 +38,13 @@ public class DragandDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, ID
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!isDraggable) return;
         rectTransform.anchoredPosition += eventData.delta;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!isDraggable) return;
         image.color = new Color(255f, 255f, 255f, 1f);
         image.raycastTarget = true; // Включаем Raycast для TextBox
 
