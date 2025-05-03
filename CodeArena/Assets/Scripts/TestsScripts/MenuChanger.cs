@@ -78,13 +78,14 @@ public class MenuChanger : MonoBehaviour
 
         if (nextButton != null)
         {
-            // На окне результатов "вперед" можно оставить активным
+            // На последнем меню кнопка всегда активна (итоги)
             if (currentIndex == menus.Length - 1)
             {
                 nextButton.interactable = true;
             }
             else
             {
+                // Если на этот вопрос уже ответили — кнопка доступна
                 nextButton.interactable = questionCompleted != null 
                     && currentIndex >= 0 
                     && currentIndex < questionCompleted.Length 
